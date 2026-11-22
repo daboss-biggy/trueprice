@@ -447,6 +447,149 @@ document.getElementById("savedComparisons").addEventListener("click", event => {
 
 renderSavedComparisons();
 
+// TRUEPRICE V2 — SHAREABLE COMPARISONS
+
+const shareArea = document.createElement("div");
+shareArea.style.marginTop = "20px";
+shareArea.innerHTML = `
+  <button class="secondary" id="shareComparison">
+    ↗ Share this comparison
+  </button>
+  <p class="sub" id="shareStatus" style="margin-top:10px"></p>
+`;
+document.querySelector(".panel").appendChild(shareArea);
+
+document.getElementById("shareComparison").addEventListener("click", async () => {
+  const cards = [...offersEl.children];
+
+  if (cards.length < 2) {
+    alert("Add at least two offers first.");
+    return;
+  }
+
+  const offers = cards.map(card => {
+    const get = cls => card.querySelector("." + cls).value.trim();
+
+    return {
+      name: get("name"),
+      price: get("price"),
+      shipping: get("shipping"),
+      discount: get("discount"),
+      quantity: get("quantity"),
+      unit: get("unit")
+    };
+  });
+
+  const invalid = offers.some(o =>
+    o.price === "" ||
+    !Number.isFinite(Number(o.price)) || Number(o.price) < 0 ||
+    !Number.isFinite(Number(o.shipping)) || Number(o.shipping) < 0 ||
+    !Number.isFinite(Number(o.discount)) || Number(o.discount) < 0 ||
+    !Number.isFinite(Number(o.quantity)) || Number(o.quantity) <= 0
+  );
+
+  if (invalid || !offers.every(o => o.unit === offers[0].unit)) {
+    alert("Please enter valid offer details and use the same unit for every offer.");
+    return;
+  }
+
+  const payload = {
+    currency: document.getElementById("currency").value,
+    offers
+  };
+
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const shareLink = location.origin + location.pathname + "#share=" + encoded;
+
+  const status = document.getElementById("shareStatus");
+
+  try {
+    await navigator.clipboard.writeText(shareLink);
+    status.textContent = "✓ Share link copied! Send it to your friends.";
+  } catch {
+    status.textContent = "Copy this link:";
+    const linkInput = document.createElement("input");
+    linkInput.value = shareLink;
+    linkInput.readOnly = true;
+    linkInput.style.marginTop = "10px";
+    status.appendChild(linkInput);
+    linkInput.select();
+  }
+});
+
+// LOAD A SHARED COMPARISON FROM ITS LINK
+
+function loadSharedComparison() {
+  if (!location.hash.startsWith("#share=")) return;
+
+  try {
+    const encoded = location.hash.slice(7);
+    const payload = JSON.parse(
+      decodeURIComponent(escape(atob(encoded)))
+    );
+
+    const allowedCurrencies = ["MYR","USD","SGD","GBP","EUR","AUD","INR"];
+    const allowedUnits = ["item","kg","g","L","ml","m"];
+
+    if (
+      !payload ||
+      !Array.isArray(payload.offers) ||
+      payload.offers.length < 2 ||
+      payload.offers.length > MAX_OFFERS ||
+      !allowedCurrencies.includes(payload.currency)
+    ) throw new Error("Invalid shared comparison");
+
+    for (const offer of payload.offers) {
+      if (
+        !offer ||
+        typeof offer.name !== "string" ||
+        typeof offer.price !== "string" ||
+        typeof offer.shipping !== "string" ||
+        typeof offer.discount !== "string" ||
+        typeof offer.quantity !== "string" ||
+        !allowedUnits.includes(offer.unit) ||
+        ![offer.price,offer.shipping,offer.discount,offer.quantity].every(v =>
+          v.trim() !== "" && Number.isFinite(Number(v))
+        ) ||
+        Number(offer.price) < 0 ||
+        Number(offer.shipping) < 0 ||
+        Number(offer.discount) < 0 ||
+        Number(offer.quantity) <= 0
+      ) throw new Error("Invalid offer");
+    }
+
+    if (!payload.offers.every(o => o.unit === payload.offers[0].unit)) {
+      throw new Error("Inconsistent units");
+    }
+
+    offersEl.innerHTML = "";
+    count = 0;
+
+    payload.offers.forEach(offer => {
+      addOffer();
+      const card = offersEl.lastElementChild;
+
+      Object.entries(offer).forEach(([key, value]) => {
+        const input = card.querySelector("." + key);
+        if (input) input.value = value;
+      });
+    });
+
+    document.getElementById("currency").value = payload.currency;
+    refreshNumbers();
+    compare();
+
+    document.getElementById("shareStatus").textContent =
+      "✓ Shared comparison loaded successfully.";
+
+  } catch {
+    document.getElementById("shareStatus").textContent =
+      "This sharing link is invalid or incomplete.";
+  }
+}
+
+loadSharedComparison();
+
 </script>
 </body>
 </html>

@@ -1,1 +1,597 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compare real product costs, shipping and discounts with TruePrice. Find the deal that actually saves you money.">
+<title>TruePrice — Know What You're Really Paying</title>
+<style>
+:root {
+  --bg:#0b1020; --panel:#131b2e; --panel2:#19243a;
+  --text:#f4f7fb; --muted:#9aa8bd; --green:#8ee6b0;
+  --border:#28364e; --red:#ff9292;
+}
+* {box-sizing:border-box}
+body {
+  margin:0; font-family:Inter,Arial,sans-serif; color:var(--text);
+  background:radial-gradient(ellipse at top,#182943 0%,var(--bg) 55%);
+  min-height:100vh;
+}
+header {
+  max-width:1100px; margin:auto; padding:25px 22px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.logo {font-size:24px;font-weight:850;letter-spacing:-1px}
+.logo span {color:var(--green)}
+.tag {font-size:12px;color:var(--muted);letter-spacing:1px}
+main {max-width:1100px;margin:35px auto;padding:0 22px 60px}
+.hero {text-align:center;margin:55px auto 38px;max-width:700px}
+.eyebrow {color:var(--green);font-size:12px;font-weight:800;letter-spacing:2px}
+h1 {font-size:clamp(38px,7vw,66px);line-height:1.04;letter-spacing:-3px;margin:15px 0}
+h1 span {color:var(--green)}
+.hero p {color:var(--muted);font-size:17px;line-height:1.6}
+.panel {
+  background:rgba(19,27,46,.94);border:1px solid var(--border);
+  border-radius:20px;padding:24px;margin:20px 0;
+  box-shadow:0 18px 55px #0002;
+}
+.topline {display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+h2 {font-size:20px;margin:0 0 7px}
+.sub {color:var(--muted);font-size:13px;margin:0}
+select,input {
+  width:100%;background:#0d1628;border:1px solid var(--border);
+  color:var(--text);padding:12px;border-radius:10px;font-size:14px;
+  outline:none;min-width:0;
+}
+input:focus,select:focus {border-color:var(--green)}
+.currency {width:auto;min-width:100px}
+.offers {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-top:20px}
+.offer {background:var(--panel2);border:1px solid var(--border);border-radius:15px;padding:17px}
+.offer h3 {font-size:15px;margin:0 0 15px;display:flex;justify-content:space-between}
+.fields {display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label {display:block;font-size:11px;color:var(--muted);margin:0 0 6px}
+.field.full {grid-column:1/-1}
+.actions {display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button {
+  border:0;border-radius:10px;padding:13px 18px;font-weight:750;
+  cursor:pointer;font-size:13px;
+}
+.primary {background:var(--green);color:#10251b}
+.secondary {background:#24334b;color:var(--text);border:1px solid var(--border)}
+.remove {background:transparent;color:var(--red);padding:0;font-size:12px}
+button:disabled {opacity:.35;cursor:not-allowed}
+.results {margin-top:24px;display:none}
+.results.show {display:block}
+.result-card {
+  display:flex;justify-content:space-between;align-items:center;
+  gap:15px;background:#10291f;border:1px solid #347c59;
+  border-radius:15px;padding:20px;flex-wrap:wrap;margin:15px 0;
+}
+.winner {color:var(--green);font-size:11px;font-weight:850;letter-spacing:1px}
+.big-price {font-size:30px;font-weight:850;letter-spacing:-1px;margin-top:5px}
+.result-list {display:grid;gap:10px}
+.result-row {
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  background:#0d1628;border:1px solid var(--border);padding:15px;
+  border-radius:12px;flex-wrap:wrap;
+}
+.result-row strong {display:block;margin-bottom:5px}
+.result-row small {color:var(--muted)}
+.result-right {text-align:right}
+.result-right b {display:block;font-size:17px}
+.note {font-size:12px;color:var(--muted);line-height:1.6;margin-top:20px}
+footer {text-align:center;padding:25px;color:var(--muted);font-size:12px}
+@media(max-width:650px) {
+  main {margin-top:15px}
+  .hero {margin-top:35px}
+  .offers {grid-template-columns:1fr}
+  .panel {padding:17px}
+  header {padding:20px}
+  h1 {letter-spacing:-2px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">True<span>Price</span>.</div>
+  <div class="tag">SHOP SMARTER. SAVE MORE.</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">THE SMARTER WAY TO SHOP</div>
+    <h1>Know what you're <span>really paying.</span></h1>
+    <p>Compare prices, shipping and discounts in seconds. Because the cheapest listing isn't always the best deal.</p>
+  </section>
+
+  <section class="panel">
+    <div class="topline">
+      <div>
+        <h2>Compare your deals</h2>
+        <p class="sub">Enter the details of the offers you're considering.</p>
+      </div>
+      <select id="currency" class="currency" aria-label="Currency">
+        <option value="MYR">MYR (RM)</option>
+        <option value="USD">USD ($)</option>
+        <option value="SGD">SGD (S$)</option>
+        <option value="GBP">GBP (£)</option>
+        <option value="EUR">EUR (€)</option>
+        <option value="AUD">AUD (A$)</option>
+        <option value="INR">INR (₹)</option>
+      </select>
+    </div>
+
+    <div class="offers" id="offers"></div>
+
+    <div class="actions">
+      <button class="secondary" id="addBtn">+ Add another offer</button>
+      <button class="primary" id="compareBtn">Compare deals →</button>
+    </div>
+
+    <div class="results" id="results" aria-live="polite">
+      <div class="result-card" id="winner"></div>
+      <h2>Your comparison</h2>
+      <p class="sub">Ranked by lowest cost per unit.</p>
+      <div class="result-list" id="resultList"></div>
+    </div>
+
+    <p class="note">TruePrice uses the figures you enter. It does not verify retailer prices, voucher eligibility, taxes, delivery conditions or cashback. Always check the final amount at checkout.</p>
+  </section>
+</main>
+
+<footer>© 2026 TruePrice. Know what you're really paying.</footer>
+
+<script>
+const offersEl = document.getElementById("offers");
+const addBtn = document.getElementById("addBtn");
+const resultsEl = document.getElementById("results");
+let count = 0;
+const MAX_OFFERS = 5;
+
+function money(value) {
+  const currency = document.getElementById("currency").value;
+  try {
+    return new Intl.NumberFormat("en", {
+      style:"currency", currency, maximumFractionDigits:2
+    }).format(value);
+  } catch {
+    return value.toFixed(2);
+  }
+}
+
+function addOffer() {
+  if (count >= MAX_OFFERS) return;
+  count++;
+  const id = count;
+  const card = document.createElement("div");
+  card.className = "offer";
+  card.dataset.id = id;
+  card.innerHTML = `
+    <h3><span>Offer ${id}</span>
+      <button class="remove" type="button">Remove</button>
+    </h3>
+    <div class="fields">
+      <div class="field full">
+        <label>Store or product name</label>
+        <input class="name" maxlength="60" placeholder="e.g. Store A">
+      </div>
+      <div class="field">
+        <label>Product price</label>
+        <input class="price" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>Shipping cost</label>
+        <input class="shipping" type="number" min="0" step="0.01" value="0">
+      </div>
+      <div class="field">
+        <label>Discount / voucher</label>
+        <input class="discount" type="number" min="0" step="0.01" value="0">
+      </div>
+      <div class="field">
+        <label>Quantity / size</label>
+        <input class="quantity" type="number" min="0.000001" step="any" value="1">
+      </div>
+      <div class="field full">
+        <label>Unit of measurement</label>
+        <select class="unit">
+          <option value="item">Items / units</option>
+          <option value="kg">Kilograms</option>
+          <option value="g">Grams</option>
+          <option value="L">Litres</option>
+          <option value="ml">Millilitres</option>
+          <option value="m">Metres</option>
+        </select>
+      </div>
+    </div>`;
+  card.querySelector(".remove").addEventListener("click", () => {
+    if (offersEl.children.length <= 2) {
+      alert("Keep at least two offers to compare.");
+      return;
+    }
+    card.remove();
+    refreshNumbers();
+    resultsEl.classList.remove("show");
+  });
+  card.querySelectorAll("input,select").forEach(el =>
+    el.addEventListener("input", () => resultsEl.classList.remove("show"))
+  );
+  offersEl.appendChild(card);
+  updateAddButton();
+}
+
+function refreshNumbers() {
+  [...offersEl.children].forEach((card,index) => {
+    card.querySelector("h3 span").textContent = "Offer " + (index + 1);
+  });
+  count = offersEl.children.length;
+  updateAddButton();
+}
+
+function updateAddButton() {
+  addBtn.disabled = offersEl.children.length >= MAX_OFFERS;
+  addBtn.textContent = addBtn.disabled ? "Maximum 5 offers" : "+ Add another offer";
+}
+
+function compare() {
+  const cards = [...offersEl.children];
+  if (cards.length < 2) {
+    alert("Add at least two offers to compare.");
+    return;
+  }
+
+  const data = [];
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    const get = cls => card.querySelector("." + cls).value.trim();
+    const name = get("name") || "Offer " + (i + 1);
+    const price = Number(get("price"));
+    const shipping = Number(get("shipping"));
+    const discount = Number(get("discount"));
+    const quantity = Number(get("quantity"));
+    const unit = get("unit");
+
+    if (get("price") === "" || !Number.isFinite(price) || price < 0 ||
+        !Number.isFinite(shipping) || shipping < 0 ||
+        !Number.isFinite(discount) || discount < 0 ||
+        !Number.isFinite(quantity) || quantity <= 0) {
+      alert("Please enter valid prices, shipping, discounts and quantities for every offer.");
+      return;
+    }
+
+    const total = Math.max(0, price + shipping - discount);
+    data.push({name,price,shipping,discount,quantity,unit,total,perUnit:total/quantity});
+  }
+
+  const unit = data[0].unit;
+  if (!data.every(item => item.unit === unit)) {
+    alert("Please choose the same unit of measurement for every offer.");
+    return;
+  }
+
+  data.sort((a,b) => a.perUnit - b.perUnit);
+  const best = data[0];
+  const symbol = unit === "item" ? "per item" : "per " + unit;
+
+  document.getElementById("winner").innerHTML = `
+    <div>
+      <div class="winner">🏆 BEST VALUE</div>
+      <div style="font-size:20px;font-weight:800;margin-top:7px">${escapeHTML(best.name)}</div>
+      <div class="sub" style="margin-top:6px">Lowest cost ${symbol}</div>
+    </div>
+    <div class="big-price">${money(best.perUnit)}<div class="sub">per ${unit === "item" ? "item" : unit}</div></div>`;
+
+  document.getElementById("resultList").innerHTML = data.map((item,index) => `
+    <div class="result-row">
+      <div>
+        <strong>${index === 0 ? "🏆 " : ""}${escapeHTML(item.name)}</strong>
+        <small>Product ${money(item.price)} + shipping ${money(item.shipping)} − discount ${money(item.discount)}</small>
+      </div>
+      <div class="result-right">
+        <b>${money(item.perUnit)} / ${unit}</b>
+        <small>Total: ${money(item.total)}</small>
+      </div>
+    </div>`).join("");
+
+  resultsEl.classList.add("show");
+  resultsEl.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function escapeHTML(value) {
+  return value.replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[char]);
+}
+
+addBtn.addEventListener("click", addOffer);
+document.getElementById("compareBtn").addEventListener("click", compare);
+document.getElementById("currency").addEventListener("change", () => {
+  if (resultsEl.classList.contains("show")) compare();
+});
+
+addOffer();
+addOffer();
+  
+// TRUEPRICE V2 — SAVED COMPARISONS
+
+const saveArea = document.createElement("div");
+saveArea.innerHTML = `
+  <div style="margin-top:25px;padding-top:20px;border-top:1px solid #28364e">
+    <h2>My saved comparisons</h2>
+    <p class="sub">Keep your favourite comparisons for later.</p>
+    <button class="primary" id="saveComparison" style="margin:15px 0">
+      + Save this comparison
+    </button>
+    <div id="savedComparisons"></div>
+  </div>
+`;
+document.querySelector(".panel").appendChild(saveArea);
+
+function getSavedComparisons() {
+  try {
+    return JSON.parse(localStorage.getItem("trueprice-saved") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function renderSavedComparisons() {
+  const saved = getSavedComparisons();
+  const container = document.getElementById("savedComparisons");
+
+  if (saved.length === 0) {
+    container.innerHTML = '<p class="sub">No saved comparisons yet.</p>';
+    return;
+  }
+
+  container.innerHTML = saved.map((item, index) => `
+    <div style="background:#0d1628;border:1px solid #28364e;padding:14px;border-radius:12px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <strong>${escapeHTML(item.title)}</strong>
+        <div class="sub" style="margin-top:5px">${escapeHTML(item.date)}</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="secondary" data-load="${index}">Load</button>
+        <button class="remove" data-delete="${index}">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+document.getElementById("saveComparison").addEventListener("click", () => {
+  const cards = [...offersEl.children];
+
+  if (cards.length < 2) {
+    alert("Add at least two offers first.");
+    return;
+  }
+
+  const offers = cards.map(card => {
+    const get = cls => card.querySelector("." + cls).value.trim();
+
+    return {
+      name: get("name"),
+      price: get("price"),
+      shipping: get("shipping"),
+      discount: get("discount"),
+      quantity: get("quantity"),
+      unit: get("unit")
+    };
+  });
+
+  const invalid = offers.some(o =>
+    o.price === "" ||
+    !Number.isFinite(Number(o.price)) || Number(o.price) < 0 ||
+    !Number.isFinite(Number(o.shipping)) || Number(o.shipping) < 0 ||
+    !Number.isFinite(Number(o.discount)) || Number(o.discount) < 0 ||
+    !Number.isFinite(Number(o.quantity)) || Number(o.quantity) <= 0
+  );
+
+  if (invalid || !offers.every(o => o.unit === offers[0].unit)) {
+    alert("Enter valid offer details and use the same unit for every offer.");
+    return;
+  }
+
+  const saved = getSavedComparisons();
+
+  saved.unshift({
+    title: offers[0].name || "My comparison",
+    date: new Date().toLocaleString(),
+    currency: document.getElementById("currency").value,
+    offers
+  });
+
+  try {
+    localStorage.setItem("trueprice-saved", JSON.stringify(saved.slice(0, 20)));
+    renderSavedComparisons();
+    alert("Comparison saved!");
+  } catch {
+    alert("Could not save. Your browser storage may be full or disabled.");
+  }
+});
+
+document.getElementById("savedComparisons").addEventListener("click", event => {
+  const loadIndex = event.target.dataset.load;
+  const deleteIndex = event.target.dataset.delete;
+  const saved = getSavedComparisons();
+
+  if (loadIndex !== undefined) {
+    const item = saved[Number(loadIndex)];
+    if (!item) return;
+
+    offersEl.innerHTML = "";
+    count = 0;
+
+    item.offers.forEach(offer => {
+      addOffer();
+      const card = offersEl.lastElementChild;
+
+      Object.entries(offer).forEach(([key, value]) => {
+        const input = card.querySelector("." + key);
+        if (input) input.value = value;
+      });
+    });
+
+    document.getElementById("currency").value = item.currency;
+    refreshNumbers();
+    resultsEl.classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  if (deleteIndex !== undefined) {
+    saved.splice(Number(deleteIndex), 1);
+    localStorage.setItem("trueprice-saved", JSON.stringify(saved));
+    renderSavedComparisons();
+  }
+});
+
+renderSavedComparisons();
+
+// TRUEPRICE V2 — SHAREABLE COMPARISONS
+
+const shareArea = document.createElement("div");
+shareArea.style.marginTop = "20px";
+shareArea.innerHTML = `
+  <button class="secondary" id="shareComparison">
+    ↗ Share this comparison
+  </button>
+  <p class="sub" id="shareStatus" style="margin-top:10px"></p>
+`;
+document.querySelector(".panel").appendChild(shareArea);
+
+document.getElementById("shareComparison").addEventListener("click", async () => {
+  const cards = [...offersEl.children];
+
+  if (cards.length < 2) {
+    alert("Add at least two offers first.");
+    return;
+  }
+
+  const offers = cards.map(card => {
+    const get = cls => card.querySelector("." + cls).value.trim();
+
+    return {
+      name: get("name"),
+      price: get("price"),
+      shipping: get("shipping"),
+      discount: get("discount"),
+      quantity: get("quantity"),
+      unit: get("unit")
+    };
+  });
+
+  const invalid = offers.some(o =>
+    o.price === "" ||
+    !Number.isFinite(Number(o.price)) || Number(o.price) < 0 ||
+    !Number.isFinite(Number(o.shipping)) || Number(o.shipping) < 0 ||
+    !Number.isFinite(Number(o.discount)) || Number(o.discount) < 0 ||
+    !Number.isFinite(Number(o.quantity)) || Number(o.quantity) <= 0
+  );
+
+  if (invalid || !offers.every(o => o.unit === offers[0].unit)) {
+    alert("Please enter valid offer details and use the same unit for every offer.");
+    return;
+  }
+
+  const payload = {
+    currency: document.getElementById("currency").value,
+    offers
+  };
+
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const shareLink = location.origin + location.pathname + "#share=" + encoded;
+
+  const status = document.getElementById("shareStatus");
+
+  try {
+    await navigator.clipboard.writeText(shareLink);
+    status.textContent = "✓ Share link copied! Send it to your friends.";
+  } catch {
+    status.textContent = "Copy this link:";
+    const linkInput = document.createElement("input");
+    linkInput.value = shareLink;
+    linkInput.readOnly = true;
+    linkInput.style.marginTop = "10px";
+    status.appendChild(linkInput);
+    linkInput.select();
+  }
+});
+
+// LOAD A SHARED COMPARISON FROM ITS LINK
+
+function loadSharedComparison() {
+  if (!location.hash.startsWith("#share=")) return;
+
+  try {
+    const encoded = location.hash.slice(7);
+    const payload = JSON.parse(
+      decodeURIComponent(escape(atob(encoded)))
+    );
+
+    const allowedCurrencies = ["MYR","USD","SGD","GBP","EUR","AUD","INR"];
+    const allowedUnits = ["item","kg","g","L","ml","m"];
+
+    if (
+      !payload ||
+      !Array.isArray(payload.offers) ||
+      payload.offers.length < 2 ||
+      payload.offers.length > MAX_OFFERS ||
+      !allowedCurrencies.includes(payload.currency)
+    ) throw new Error("Invalid shared comparison");
+
+    for (const offer of payload.offers) {
+      if (
+        !offer ||
+        typeof offer.name !== "string" ||
+        typeof offer.price !== "string" ||
+        typeof offer.shipping !== "string" ||
+        typeof offer.discount !== "string" ||
+        typeof offer.quantity !== "string" ||
+        !allowedUnits.includes(offer.unit) ||
+        ![offer.price,offer.shipping,offer.discount,offer.quantity].every(v =>
+          v.trim() !== "" && Number.isFinite(Number(v))
+        ) ||
+        Number(offer.price) < 0 ||
+        Number(offer.shipping) < 0 ||
+        Number(offer.discount) < 0 ||
+        Number(offer.quantity) <= 0
+      ) throw new Error("Invalid offer");
+    }
+
+    if (!payload.offers.every(o => o.unit === payload.offers[0].unit)) {
+      throw new Error("Inconsistent units");
+    }
+
+    offersEl.innerHTML = "";
+    count = 0;
+
+    payload.offers.forEach(offer => {
+      addOffer();
+      const card = offersEl.lastElementChild;
+
+      Object.entries(offer).forEach(([key, value]) => {
+        const input = card.querySelector("." + key);
+        if (input) input.value = value;
+      });
+    });
+
+    document.getElementById("currency").value = payload.currency;
+    refreshNumbers();
+    compare();
+
+    document.getElementById("shareStatus").textContent =
+      "✓ Shared comparison loaded successfully.";
+
+  } catch {
+    document.getElementById("shareStatus").textContent =
+      "This sharing link is invalid or incomplete.";
+  }
+}
+
+loadSharedComparison();
+
+</script>
+</body>
+</html>
+
+

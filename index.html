@@ -311,6 +311,142 @@ document.getElementById("currency").addEventListener("change", () => {
 
 addOffer();
 addOffer();
+  
+// TRUEPRICE V2 — SAVED COMPARISONS
+
+const saveArea = document.createElement("div");
+saveArea.innerHTML = `
+  <div style="margin-top:25px;padding-top:20px;border-top:1px solid #28364e">
+    <h2>My saved comparisons</h2>
+    <p class="sub">Keep your favourite comparisons for later.</p>
+    <button class="primary" id="saveComparison" style="margin:15px 0">
+      + Save this comparison
+    </button>
+    <div id="savedComparisons"></div>
+  </div>
+`;
+document.querySelector(".panel").appendChild(saveArea);
+
+function getSavedComparisons() {
+  try {
+    return JSON.parse(localStorage.getItem("trueprice-saved") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function renderSavedComparisons() {
+  const saved = getSavedComparisons();
+  const container = document.getElementById("savedComparisons");
+
+  if (saved.length === 0) {
+    container.innerHTML = '<p class="sub">No saved comparisons yet.</p>';
+    return;
+  }
+
+  container.innerHTML = saved.map((item, index) => `
+    <div style="background:#0d1628;border:1px solid #28364e;padding:14px;border-radius:12px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <strong>${escapeHTML(item.title)}</strong>
+        <div class="sub" style="margin-top:5px">${escapeHTML(item.date)}</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="secondary" data-load="${index}">Load</button>
+        <button class="remove" data-delete="${index}">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+document.getElementById("saveComparison").addEventListener("click", () => {
+  const cards = [...offersEl.children];
+
+  if (cards.length < 2) {
+    alert("Add at least two offers first.");
+    return;
+  }
+
+  const offers = cards.map(card => {
+    const get = cls => card.querySelector("." + cls).value.trim();
+
+    return {
+      name: get("name"),
+      price: get("price"),
+      shipping: get("shipping"),
+      discount: get("discount"),
+      quantity: get("quantity"),
+      unit: get("unit")
+    };
+  });
+
+  const invalid = offers.some(o =>
+    o.price === "" ||
+    !Number.isFinite(Number(o.price)) || Number(o.price) < 0 ||
+    !Number.isFinite(Number(o.shipping)) || Number(o.shipping) < 0 ||
+    !Number.isFinite(Number(o.discount)) || Number(o.discount) < 0 ||
+    !Number.isFinite(Number(o.quantity)) || Number(o.quantity) <= 0
+  );
+
+  if (invalid || !offers.every(o => o.unit === offers[0].unit)) {
+    alert("Enter valid offer details and use the same unit for every offer.");
+    return;
+  }
+
+  const saved = getSavedComparisons();
+
+  saved.unshift({
+    title: offers[0].name || "My comparison",
+    date: new Date().toLocaleString(),
+    currency: document.getElementById("currency").value,
+    offers
+  });
+
+  try {
+    localStorage.setItem("trueprice-saved", JSON.stringify(saved.slice(0, 20)));
+    renderSavedComparisons();
+    alert("Comparison saved!");
+  } catch {
+    alert("Could not save. Your browser storage may be full or disabled.");
+  }
+});
+
+document.getElementById("savedComparisons").addEventListener("click", event => {
+  const loadIndex = event.target.dataset.load;
+  const deleteIndex = event.target.dataset.delete;
+  const saved = getSavedComparisons();
+
+  if (loadIndex !== undefined) {
+    const item = saved[Number(loadIndex)];
+    if (!item) return;
+
+    offersEl.innerHTML = "";
+    count = 0;
+
+    item.offers.forEach(offer => {
+      addOffer();
+      const card = offersEl.lastElementChild;
+
+      Object.entries(offer).forEach(([key, value]) => {
+        const input = card.querySelector("." + key);
+        if (input) input.value = value;
+      });
+    });
+
+    document.getElementById("currency").value = item.currency;
+    refreshNumbers();
+    resultsEl.classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  if (deleteIndex !== undefined) {
+    saved.splice(Number(deleteIndex), 1);
+    localStorage.setItem("trueprice-saved", JSON.stringify(saved));
+    renderSavedComparisons();
+  }
+});
+
+renderSavedComparisons();
+
 </script>
 </body>
 </html>

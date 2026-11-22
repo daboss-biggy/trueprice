@@ -1,1 +1,317 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compare real product costs, shipping and discounts with TruePrice. Find the deal that actually saves you money.">
+<title>TruePrice — Know What You're Really Paying</title>
+<style>
+:root {
+  --bg:#0b1020; --panel:#131b2e; --panel2:#19243a;
+  --text:#f4f7fb; --muted:#9aa8bd; --green:#8ee6b0;
+  --border:#28364e; --red:#ff9292;
+}
+* {box-sizing:border-box}
+body {
+  margin:0; font-family:Inter,Arial,sans-serif; color:var(--text);
+  background:radial-gradient(ellipse at top,#182943 0%,var(--bg) 55%);
+  min-height:100vh;
+}
+header {
+  max-width:1100px; margin:auto; padding:25px 22px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.logo {font-size:24px;font-weight:850;letter-spacing:-1px}
+.logo span {color:var(--green)}
+.tag {font-size:12px;color:var(--muted);letter-spacing:1px}
+main {max-width:1100px;margin:35px auto;padding:0 22px 60px}
+.hero {text-align:center;margin:55px auto 38px;max-width:700px}
+.eyebrow {color:var(--green);font-size:12px;font-weight:800;letter-spacing:2px}
+h1 {font-size:clamp(38px,7vw,66px);line-height:1.04;letter-spacing:-3px;margin:15px 0}
+h1 span {color:var(--green)}
+.hero p {color:var(--muted);font-size:17px;line-height:1.6}
+.panel {
+  background:rgba(19,27,46,.94);border:1px solid var(--border);
+  border-radius:20px;padding:24px;margin:20px 0;
+  box-shadow:0 18px 55px #0002;
+}
+.topline {display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+h2 {font-size:20px;margin:0 0 7px}
+.sub {color:var(--muted);font-size:13px;margin:0}
+select,input {
+  width:100%;background:#0d1628;border:1px solid var(--border);
+  color:var(--text);padding:12px;border-radius:10px;font-size:14px;
+  outline:none;min-width:0;
+}
+input:focus,select:focus {border-color:var(--green)}
+.currency {width:auto;min-width:100px}
+.offers {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-top:20px}
+.offer {background:var(--panel2);border:1px solid var(--border);border-radius:15px;padding:17px}
+.offer h3 {font-size:15px;margin:0 0 15px;display:flex;justify-content:space-between}
+.fields {display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label {display:block;font-size:11px;color:var(--muted);margin:0 0 6px}
+.field.full {grid-column:1/-1}
+.actions {display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button {
+  border:0;border-radius:10px;padding:13px 18px;font-weight:750;
+  cursor:pointer;font-size:13px;
+}
+.primary {background:var(--green);color:#10251b}
+.secondary {background:#24334b;color:var(--text);border:1px solid var(--border)}
+.remove {background:transparent;color:var(--red);padding:0;font-size:12px}
+button:disabled {opacity:.35;cursor:not-allowed}
+.results {margin-top:24px;display:none}
+.results.show {display:block}
+.result-card {
+  display:flex;justify-content:space-between;align-items:center;
+  gap:15px;background:#10291f;border:1px solid #347c59;
+  border-radius:15px;padding:20px;flex-wrap:wrap;margin:15px 0;
+}
+.winner {color:var(--green);font-size:11px;font-weight:850;letter-spacing:1px}
+.big-price {font-size:30px;font-weight:850;letter-spacing:-1px;margin-top:5px}
+.result-list {display:grid;gap:10px}
+.result-row {
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  background:#0d1628;border:1px solid var(--border);padding:15px;
+  border-radius:12px;flex-wrap:wrap;
+}
+.result-row strong {display:block;margin-bottom:5px}
+.result-row small {color:var(--muted)}
+.result-right {text-align:right}
+.result-right b {display:block;font-size:17px}
+.note {font-size:12px;color:var(--muted);line-height:1.6;margin-top:20px}
+footer {text-align:center;padding:25px;color:var(--muted);font-size:12px}
+@media(max-width:650px) {
+  main {margin-top:15px}
+  .hero {margin-top:35px}
+  .offers {grid-template-columns:1fr}
+  .panel {padding:17px}
+  header {padding:20px}
+  h1 {letter-spacing:-2px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">True<span>Price</span>.</div>
+  <div class="tag">SHOP SMARTER. SAVE MORE.</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">THE SMARTER WAY TO SHOP</div>
+    <h1>Know what you're <span>really paying.</span></h1>
+    <p>Compare prices, shipping and discounts in seconds. Because the cheapest listing isn't always the best deal.</p>
+  </section>
+
+  <section class="panel">
+    <div class="topline">
+      <div>
+        <h2>Compare your deals</h2>
+        <p class="sub">Enter the details of the offers you're considering.</p>
+      </div>
+      <select id="currency" class="currency" aria-label="Currency">
+        <option value="MYR">MYR (RM)</option>
+        <option value="USD">USD ($)</option>
+        <option value="SGD">SGD (S$)</option>
+        <option value="GBP">GBP (£)</option>
+        <option value="EUR">EUR (€)</option>
+        <option value="AUD">AUD (A$)</option>
+        <option value="INR">INR (₹)</option>
+      </select>
+    </div>
+
+    <div class="offers" id="offers"></div>
+
+    <div class="actions">
+      <button class="secondary" id="addBtn">+ Add another offer</button>
+      <button class="primary" id="compareBtn">Compare deals →</button>
+    </div>
+
+    <div class="results" id="results" aria-live="polite">
+      <div class="result-card" id="winner"></div>
+      <h2>Your comparison</h2>
+      <p class="sub">Ranked by lowest cost per unit.</p>
+      <div class="result-list" id="resultList"></div>
+    </div>
+
+    <p class="note">TruePrice uses the figures you enter. It does not verify retailer prices, voucher eligibility, taxes, delivery conditions or cashback. Always check the final amount at checkout.</p>
+  </section>
+</main>
+
+<footer>© 2026 TruePrice. Know what you're really paying.</footer>
+
+<script>
+const offersEl = document.getElementById("offers");
+const addBtn = document.getElementById("addBtn");
+const resultsEl = document.getElementById("results");
+let count = 0;
+const MAX_OFFERS = 5;
+
+function money(value) {
+  const currency = document.getElementById("currency").value;
+  try {
+    return new Intl.NumberFormat("en", {
+      style:"currency", currency, maximumFractionDigits:2
+    }).format(value);
+  } catch {
+    return value.toFixed(2);
+  }
+}
+
+function addOffer() {
+  if (count >= MAX_OFFERS) return;
+  count++;
+  const id = count;
+  const card = document.createElement("div");
+  card.className = "offer";
+  card.dataset.id = id;
+  card.innerHTML = `
+    <h3><span>Offer ${id}</span>
+      <button class="remove" type="button">Remove</button>
+    </h3>
+    <div class="fields">
+      <div class="field full">
+        <label>Store or product name</label>
+        <input class="name" maxlength="60" placeholder="e.g. Store A">
+      </div>
+      <div class="field">
+        <label>Product price</label>
+        <input class="price" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>Shipping cost</label>
+        <input class="shipping" type="number" min="0" step="0.01" value="0">
+      </div>
+      <div class="field">
+        <label>Discount / voucher</label>
+        <input class="discount" type="number" min="0" step="0.01" value="0">
+      </div>
+      <div class="field">
+        <label>Quantity / size</label>
+        <input class="quantity" type="number" min="0.000001" step="any" value="1">
+      </div>
+      <div class="field full">
+        <label>Unit of measurement</label>
+        <select class="unit">
+          <option value="item">Items / units</option>
+          <option value="kg">Kilograms</option>
+          <option value="g">Grams</option>
+          <option value="L">Litres</option>
+          <option value="ml">Millilitres</option>
+          <option value="m">Metres</option>
+        </select>
+      </div>
+    </div>`;
+  card.querySelector(".remove").addEventListener("click", () => {
+    if (offersEl.children.length <= 2) {
+      alert("Keep at least two offers to compare.");
+      return;
+    }
+    card.remove();
+    refreshNumbers();
+    resultsEl.classList.remove("show");
+  });
+  card.querySelectorAll("input,select").forEach(el =>
+    el.addEventListener("input", () => resultsEl.classList.remove("show"))
+  );
+  offersEl.appendChild(card);
+  updateAddButton();
+}
+
+function refreshNumbers() {
+  [...offersEl.children].forEach((card,index) => {
+    card.querySelector("h3 span").textContent = "Offer " + (index + 1);
+  });
+  count = offersEl.children.length;
+  updateAddButton();
+}
+
+function updateAddButton() {
+  addBtn.disabled = offersEl.children.length >= MAX_OFFERS;
+  addBtn.textContent = addBtn.disabled ? "Maximum 5 offers" : "+ Add another offer";
+}
+
+function compare() {
+  const cards = [...offersEl.children];
+  if (cards.length < 2) {
+    alert("Add at least two offers to compare.");
+    return;
+  }
+
+  const data = [];
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    const get = cls => card.querySelector("." + cls).value.trim();
+    const name = get("name") || "Offer " + (i + 1);
+    const price = Number(get("price"));
+    const shipping = Number(get("shipping"));
+    const discount = Number(get("discount"));
+    const quantity = Number(get("quantity"));
+    const unit = get("unit");
+
+    if (get("price") === "" || !Number.isFinite(price) || price < 0 ||
+        !Number.isFinite(shipping) || shipping < 0 ||
+        !Number.isFinite(discount) || discount < 0 ||
+        !Number.isFinite(quantity) || quantity <= 0) {
+      alert("Please enter valid prices, shipping, discounts and quantities for every offer.");
+      return;
+    }
+
+    const total = Math.max(0, price + shipping - discount);
+    data.push({name,price,shipping,discount,quantity,unit,total,perUnit:total/quantity});
+  }
+
+  const unit = data[0].unit;
+  if (!data.every(item => item.unit === unit)) {
+    alert("Please choose the same unit of measurement for every offer.");
+    return;
+  }
+
+  data.sort((a,b) => a.perUnit - b.perUnit);
+  const best = data[0];
+  const symbol = unit === "item" ? "per item" : "per " + unit;
+
+  document.getElementById("winner").innerHTML = `
+    <div>
+      <div class="winner">🏆 BEST VALUE</div>
+      <div style="font-size:20px;font-weight:800;margin-top:7px">${escapeHTML(best.name)}</div>
+      <div class="sub" style="margin-top:6px">Lowest cost ${symbol}</div>
+    </div>
+    <div class="big-price">${money(best.perUnit)}<div class="sub">per ${unit === "item" ? "item" : unit}</div></div>`;
+
+  document.getElementById("resultList").innerHTML = data.map((item,index) => `
+    <div class="result-row">
+      <div>
+        <strong>${index === 0 ? "🏆 " : ""}${escapeHTML(item.name)}</strong>
+        <small>Product ${money(item.price)} + shipping ${money(item.shipping)} − discount ${money(item.discount)}</small>
+      </div>
+      <div class="result-right">
+        <b>${money(item.perUnit)} / ${unit}</b>
+        <small>Total: ${money(item.total)}</small>
+      </div>
+    </div>`).join("");
+
+  resultsEl.classList.add("show");
+  resultsEl.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function escapeHTML(value) {
+  return value.replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[char]);
+}
+
+addBtn.addEventListener("click", addOffer);
+document.getElementById("compareBtn").addEventListener("click", compare);
+document.getElementById("currency").addEventListener("change", () => {
+  if (resultsEl.classList.contains("show")) compare();
+});
+
+addOffer();
+addOffer();
+</script>
+</body>
+</html>
+

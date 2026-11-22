@@ -590,6 +590,151 @@ function loadSharedComparison() {
 
 loadSharedComparison();
 
+// TRUEPRICE V4 — PRODUCT WATCHLIST
+
+const watchlistArea = document.createElement("section");
+watchlistArea.style.cssText =
+  "margin-top:30px;padding-top:25px;border-top:1px solid #28364e";
+
+watchlistArea.innerHTML = `
+  <h2>My watchlist</h2>
+  <p class="sub">Keep an eye on products you want to buy.</p>
+
+  <div class="fields" style="margin-top:18px">
+    <div class="field full">
+      <label>Product name</label>
+      <input id="watchName" maxlength="80" placeholder="e.g. Wireless headphones">
+    </div>
+    <div class="field">
+      <label>Current price</label>
+      <input id="watchCurrent" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="field">
+      <label>Your target price</label>
+      <input id="watchTarget" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+  </div>
+
+  <button class="primary" id="addWatch" style="margin-top:15px">
+    + Add to watchlist
+  </button>
+
+  <div id="watchItems" style="margin-top:15px"></div>
+`;
+
+document.querySelector(".panel").appendChild(watchlistArea);
+
+function getWatchlist() {
+  try {
+    return JSON.parse(localStorage.getItem("trueprice-watchlist") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function renderWatchlist() {
+  const items = getWatchlist();
+  const container = document.getElementById("watchItems");
+
+  if (!items.length) {
+    container.innerHTML = '<p class="sub">Your watchlist is empty.</p>';
+    return;
+  }
+
+  container.innerHTML = items.map((item, index) => {
+    const difference = item.current - item.target;
+
+    return `
+      <div style="background:#0d1628;border:1px solid #28364e;padding:16px;border-radius:13px;margin-top:10px">
+        <div style="display:flex;justify-content:space-between;gap:12px">
+          <strong>${escapeHTML(item.name)}</strong>
+          <button class="remove" data-watch-delete="${index}">Remove</button>
+        </div>
+        <div class="sub" style="margin-top:12px">
+          Current price: <strong>${money(item.current)}</strong>
+          <br>Target price: <strong>${money(item.target)}</strong>
+        </div>
+        <div style="margin-top:12px;color:${difference <= 0 ? "#8ee6b0" : "#9aa8bd"};font-size:13px;font-weight:700">
+          ${difference <= 0
+            ? "✓ Your target price has been reached!"
+            : money(difference) + " above your target price"}
+        </div>
+        <button class="secondary" data-watch-update="${index}" style="margin-top:12px">
+          Update price
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+document.getElementById("addWatch").addEventListener("click", () => {
+  const name = document.getElementById("watchName").value.trim();
+  const currentText = document.getElementById("watchCurrent").value;
+  const targetText = document.getElementById("watchTarget").value;
+
+  const current = Number(currentText);
+  const target = Number(targetText);
+
+  if (
+    !name || currentText === "" || targetText === "" ||
+    !Number.isFinite(current) || !Number.isFinite(target) ||
+    current < 0 || target < 0
+  ) {
+    alert("Please enter a product name and valid prices.");
+    return;
+  }
+
+  const items = getWatchlist();
+  if (items.length >= 30) {
+    alert("Your watchlist is full. Remove an item first.");
+    return;
+  }
+
+  items.push({name, current, target});
+
+  try {
+    localStorage.setItem("trueprice-watchlist", JSON.stringify(items));
+    document.getElementById("watchName").value = "";
+    document.getElementById("watchCurrent").value = "";
+    document.getElementById("watchTarget").value = "";
+    renderWatchlist();
+  } catch {
+    alert("Could not save your watchlist.");
+  }
+});
+
+document.getElementById("watchItems").addEventListener("click", event => {
+  const deleteIndex = event.target.dataset.watchDelete;
+  const updateIndex = event.target.dataset.watchUpdate;
+  const items = getWatchlist();
+
+  if (deleteIndex !== undefined) {
+    items.splice(Number(deleteIndex), 1);
+    localStorage.setItem("trueprice-watchlist", JSON.stringify(items));
+    renderWatchlist();
+  }
+
+  if (updateIndex !== undefined) {
+    const item = items[Number(updateIndex)];
+    if (!item) return;
+
+    const answer = prompt("Enter the new current price:", item.current);
+    if (answer === null || answer.trim() === "") return;
+
+    const price = Number(answer);
+    if (!Number.isFinite(price) || price < 0) {
+      alert("Enter a valid price.");
+      return;
+    }
+
+    item.current = price;
+    localStorage.setItem("trueprice-watchlist", JSON.stringify(items));
+    renderWatchlist();
+  }
+});
+
+renderWatchlist();
+
 </script>
 </body>
 </html>
